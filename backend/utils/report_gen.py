@@ -86,13 +86,15 @@ def generate_student_report(student_data: dict, marks_data: list, prediction: di
         elements.append(Paragraph("Subject-wise Performance", section_style))
         marks_table_data = [["Subject", "Marks (/100)", "Attendance (%)", "Assignment", "Status"]]
         for m in marks_data:
-            marks_val = m.get("marks", 0)
+            marks_val = m.get("marks") if m.get("marks") is not None else 0.0
+            att_val = m.get("attendance") if m.get("attendance") is not None else 0.0
+            assign_val = m.get("assignment_score") if m.get("assignment_score") is not None else 0.0
             status = "✓ Strong" if marks_val > 75 else ("✗ Weak" if marks_val < 50 else "→ Average")
             marks_table_data.append([
                 m.get("subject_name", "N/A"),
                 f"{marks_val:.1f}",
-                f"{m.get('attendance', 0):.1f}%",
-                f"{m.get('assignment_score', 0):.1f}",
+                f"{att_val:.1f}%",
+                f"{assign_val:.1f}",
                 status,
             ])
 
@@ -115,12 +117,13 @@ def generate_student_report(student_data: dict, marks_data: list, prediction: di
     if prediction:
         elements.append(Paragraph("AI Prediction Results", section_style))
         analytics = prediction.get("analytics", {})
+        avg_m = analytics.get("average_marks") if analytics.get("average_marks") is not None else 0.0
+        avg_att = analytics.get("average_attendance") if analytics.get("average_attendance") is not None else 0.0
+        conf = prediction.get("confidence") if prediction.get("confidence") is not None else 0.0
         pred_data = [
-            ["Predicted Grade", prediction.get("grade", "N/A"), "Risk Level", prediction.get("risk_level", "N/A")],
-            ["Average Marks", f"{analytics.get('average_marks', 0):.1f}%",
-             "Confidence", f"{prediction.get('confidence', 0):.1f}%"],
-            ["Avg Attendance", f"{analytics.get('average_attendance', 0):.1f}%",
-             "Weak Subjects", str(analytics.get('num_weak_subjects', 0))],
+            ["Predicted Grade", str(prediction.get("grade", "N/A")), "Risk Level", str(prediction.get("risk_level", "N/A"))],
+            ["Average Marks", f"{avg_m:.1f}%", "Confidence", f"{conf:.1f}%"],
+            ["Avg Attendance", f"{avg_att:.1f}%", "Weak Subjects", str(analytics.get("num_weak_subjects", 0))],
         ]
         pred_table = Table(pred_data, colWidths=[1.5 * inch, 2.0 * inch, 1.5 * inch, 2.0 * inch])
         pred_table.setStyle(TableStyle([

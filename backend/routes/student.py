@@ -331,9 +331,27 @@ def mark_notifications_read():
 # ─── PDF Report ───────────────────────────────────────────────────────────────
 
 @student_bp.route("/report/pdf", methods=["GET"])
-@require_student
 def download_report():
-    user_id = int(get_jwt_identity())
+    token = None
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+    elif request.args.get("token"):
+        token = request.args.get("token")
+
+    if not token:
+        return jsonify({"error": "Missing authorization token"}), 401
+
+    try:
+        from flask_jwt_extended import decode_token
+        decoded = decode_token(token)
+        user_id = int(decoded["sub"])
+        role = decoded.get("role")
+        if role != "student":
+            return jsonify({"error": "Student access required"}), 403
+    except Exception as e:
+        return jsonify({"error": f"Invalid token: {str(e)}"}), 401
+
     student, err, code = get_student_or_404(user_id)
     if err:
         return err, code
@@ -349,13 +367,16 @@ def download_report():
     guidance = {}
     if pred:
         guidance = generate_study_plan(
-            {"average_marks": pred.average_marks, "average_attendance": pred.average_attendance,
+            {"average_marks": pred.average_marks or 0, "average_attendance": pred.average_attendance or 0,
              "weak_subjects": [], "strong_subjects": [], "completion_rate": 100},
             pred.grade, pred.risk_level
         )
 
     student_data = student.to_dict()
-    pdf_bytes = generate_student_report(student_data, marks, prediction_dict, guidance)
+    try:
+        pdf_bytes = generate_student_report(student_data, marks, prediction_dict, guidance)
+    except Exception as e:
+        return jsonify({"error": f"Report generation failed: {str(e)}"}), 500
 
     return send_file(
         io.BytesIO(pdf_bytes),
