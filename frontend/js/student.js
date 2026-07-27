@@ -24,10 +24,11 @@ async function loadPerformance() {
     const { marks, analytics, latest_prediction } = data;
 
     // Stats
-    document.getElementById('stat-avg').textContent = analytics.average_marks ? `${analytics.average_marks}%` : '--';
-    document.getElementById('stat-att').textContent = analytics.average_attendance ? `${analytics.average_attendance}%` : '--';
-    document.getElementById('stat-strong').textContent = analytics.num_strong ?? '--';
-    document.getElementById('stat-weak').textContent = analytics.num_weak ?? '--';
+    const hasMarks = analytics && analytics.subject_count > 0;
+    document.getElementById('stat-avg').textContent = hasMarks ? `${fmtNum(analytics.average_marks)}%` : '--';
+    document.getElementById('stat-att').textContent = hasMarks ? `${fmtNum(analytics.average_attendance)}%` : '--';
+    document.getElementById('stat-strong').textContent = hasMarks ? (analytics.num_strong ?? 0) : '--';
+    document.getElementById('stat-weak').textContent = hasMarks ? (analytics.num_weak ?? 0) : '--';
 
     renderMarksTable(marks);
     renderMarksDetailSection(marks, analytics);

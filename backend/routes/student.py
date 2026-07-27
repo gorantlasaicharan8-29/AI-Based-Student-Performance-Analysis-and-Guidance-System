@@ -391,7 +391,17 @@ def download_report():
 def _compute_analytics(marks_list: list) -> dict:
     """Compute performance analytics from a list of mark dicts."""
     if not marks_list:
-        return {}
+        return {
+            "total_marks": 0.0,
+            "average_marks": 0.0,
+            "average_attendance": 0.0,
+            "average_assignment_score": 0.0,
+            "strong_subjects": [],
+            "weak_subjects": [],
+            "num_strong": 0,
+            "num_weak": 0,
+            "subject_count": 0,
+        }
     all_marks = [m["marks"] for m in marks_list]
     all_att = [m["attendance"] for m in marks_list]
     all_assign = [m["assignment_score"] for m in marks_list]
