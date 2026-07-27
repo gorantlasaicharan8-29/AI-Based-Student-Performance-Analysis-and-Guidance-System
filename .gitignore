@@ -23,9 +23,7 @@ wheels/
 instance/
 .webassets-cache
 
-# Database & Environment
-*.sqlite3
-*.db
+# Environment
 .env
 
 # Virtual Environment
