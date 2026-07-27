@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   chartDefaults();
   populateSidebarUser();
 
-  document.getElementById('pdf-btn').href = `${api.student.reportPdf()}?token=${getToken()}`;
+  document.getElementById('pdf-btn').href = `${api.student.reportPdf()}?token=${Auth.getToken()}`;
 
   await Promise.all([loadPerformance(), loadNotifications(), loadSubjectsForModal()]);
   loadAssignments();
