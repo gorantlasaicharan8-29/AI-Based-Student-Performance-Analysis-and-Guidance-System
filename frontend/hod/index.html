@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOD Dashboard — AI Performance System</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="/static/images/mahendra-logo.jpg" alt="Mahendra" class="sidebar-college-logo" />
+      <div class="sidebar-logo-text"><span class="brand">AI Performance</span><span class="tagline">HOD Portal</span></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-name" id="sidebar-user-name">Loading...</div>
+      <div class="user-role" id="sidebar-user-role">HOD</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" data-section="sec-overview" onclick="activateSection('sec-overview')"><span class="nav-icon">🏠</span> Dashboard</button>
+      <button class="nav-item" data-section="sec-analytics" onclick="activateSection('sec-analytics')"><span class="nav-icon">📈</span> Analytics</button>
+      <div class="nav-section-label">Students</div>
+      <button class="nav-item" data-section="sec-students" onclick="activateSection('sec-students')"><span class="nav-icon">👨‍🎓</span> All Students</button>
+      <button class="nav-item" data-section="sec-atrisk" onclick="activateSection('sec-atrisk')"><span class="nav-icon">⚠️</span> At-Risk Students</button>
+      <button class="nav-item" data-section="sec-top" onclick="activateSection('sec-top')"><span class="nav-icon">⭐</span> Top Performers</button>
+      <div class="nav-section-label">Management</div>
+      <button class="nav-item" data-section="sec-assignments" onclick="activateSection('sec-assignments')"><span class="nav-icon">📋</span> All Assignments</button>
+      <button class="nav-item" data-section="sec-teachers" onclick="activateSection('sec-teachers')"><span class="nav-icon">👩‍🏫</span> Teachers</button>
+      <button class="nav-item" data-section="sec-unit-analysis" onclick="activateSection('sec-unit-analysis');loadHodUnitAnalysis()"><span class="nav-icon">📊</span> Unit Analysis</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-secondary" style="width:100%" onclick="logout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <span class="topbar-title">HOD Dashboard</span>
+      <div class="topbar-actions">
+        <select id="hod-dept-filter" class="form-control" style="width:210px" onchange="onHodDeptChange()">
+          <option value="">All Departments</option>
+          <option>Computer Science</option><option>Information Technology</option>
+          <option>Electronics</option><option>Mechanical</option><option>Civil</option><option>Electrical</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- OVERVIEW -->
+      <section class="page-section active" id="sec-overview">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon" style="background:rgba(99,102,241,0.15)">👨‍🎓</div><div class="stat-content"><div class="stat-value" id="h-stat-students">--</div><div class="stat-label">Total Students</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:rgba(6,182,212,0.15)">👩‍🏫</div><div class="stat-content"><div class="stat-value" id="h-stat-teachers">--</div><div class="stat-label">Teachers</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15)">📋</div><div class="stat-content"><div class="stat-value" id="h-stat-assign">--</div><div class="stat-label">Assignments</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15)">⚠️</div><div class="stat-content"><div class="stat-value" id="h-stat-risk">--</div><div class="stat-label">High Risk Students</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15)">⭐</div><div class="stat-content"><div class="stat-value" id="h-stat-top">--</div><div class="stat-label">Grade A Students</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15)">📤</div><div class="stat-content"><div class="stat-value" id="h-stat-subs">--</div><div class="stat-label">Total Submissions</div></div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="section-header"><h3 class="section-title">Grade Distribution</h3></div>
+            <div class="chart-container"><canvas id="chart-grades"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="section-header"><h3 class="section-title">Risk Distribution</h3></div>
+            <div class="chart-container"><canvas id="chart-risk"></canvas></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.5rem">
+          <div class="section-header"><h3 class="section-title">Department Performance</h3></div>
+          <div class="chart-container"><canvas id="chart-dept"></canvas></div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="page-section" id="sec-analytics">
+        <div class="section-header"><h2>Academic Analytics</h2></div>
+        <div class="two-col" style="margin-bottom:1.5rem">
+          <div class="card">
+            <div class="section-header"><h3 class="section-title">Subject Performance</h3></div>
+            <div class="chart-container"><canvas id="chart-subjects-hod"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="section-header"><h3 class="section-title">Grade Trends</h3></div>
+            <div class="chart-container"><canvas id="chart-trends"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-header"><h3 class="section-title">Subject-wise Average Marks</h3></div>
+          <div class="table-container"><table>
+            <thead><tr><th>Subject</th><th>Avg Marks</th><th>Students</th><th>Performance Bar</th></tr></thead>
+            <tbody id="subject-analytics-body"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ALL STUDENTS -->
+      <section class="page-section" id="sec-students">
+        <div class="section-header">
+          <h2>All Students</h2>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <input type="text" id="hod-student-search" class="form-control" style="width:200px" placeholder="🔍 Search..." oninput="filterHodStudents()" />
+            <select id="hod-perf-filter" class="form-control" style="width:160px" onchange="filterHodStudents()">
+              <option value="">All Performance</option><option value="strong">Strong (>75%)</option>
+              <option value="average">Average (50-75%)</option><option value="weak">Weak (<50%)</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-container"><table>
+          <thead><tr><th>Name</th><th>Roll No</th><th>Dept</th><th>Sem</th><th>Avg Marks</th><th>Subjects</th><th>Grade</th><th>Risk</th><th>Actions</th></tr></thead>
+          <tbody id="hod-student-body"></tbody>
+        </table></div>
+        <div id="hod-pagination" style="display:flex;justify-content:center;gap:0.5rem;margin-top:1rem"></div>
+      </section>
+
+      <!-- AT-RISK -->
+      <section class="page-section" id="sec-atrisk">
+        <div class="section-header"><h2>⚠️ At-Risk Students</h2></div>
+        <div id="atrisk-list"></div>
+      </section>
+
+      <!-- TOP PERFORMERS -->
+      <section class="page-section" id="sec-top">
+        <div class="section-header"><h2>⭐ Top Performers</h2></div>
+        <div id="top-list"></div>
+      </section>
+
+      <!-- ASSIGNMENTS -->
+      <section class="page-section" id="sec-assignments">
+        <div class="section-header"><h2>All Assignments</h2></div>
+        <div id="hod-assign-list"></div>
+      </section>
+
+      <!-- TEACHERS -->
+      <section class="page-section" id="sec-teachers">
+        <div class="section-header"><h2>Teachers</h2></div>
+        <div class="table-container"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Assignments Created</th></tr></thead>
+          <tbody id="hod-teachers-body"></tbody>
+        </table></div>
+      </section>
+
+      <!-- UNIT ANALYSIS -->
+      <section class="page-section" id="sec-unit-analysis">
+        <div class="section-header">
+          <h2>📊 Department Unit Difficulty Analysis</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadHodUnitAnalysis()">🔄 Refresh</button>
+        </div>
+        <div id="unit-analysis-content">
+          <div class="card" style="text-align:center;padding:3rem">
+            <div style="font-size:2rem">⏳</div>
+            <p style="color:var(--text-muted)">Loading unit analysis...</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Student Full Detail Modal -->
+<div class="modal-overlay hidden" id="modal-hod-student">
+  <div class="modal" style="max-width:720px;max-height:88vh">
+    <div class="modal-header"><h3 id="hod-detail-title">Student Full Data</h3><button class="modal-close" onclick="closeModal('modal-hod-student')">×</button></div>
+    <div id="hod-detail-content"></div>
+  </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/hod.js"></script>
+<script src="/static/js/hod_syllabus.js"></script>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Student Performance System — Login</title>
+  <meta name="description" content="AI-Based Student Performance Analysis and Guidance System. Login as Student, Teacher, or HOD." />
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/login.css" />
+  <style>
+    /* ── Role Picker Screen ───────────────────────────────────────────── */
+    #role-picker { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem 1rem; }
+
+    .role-picker-header { text-align: center; margin-bottom: 2.5rem; }
+    .college-logo {
+      width: 130px;
+      height: 130px;
+      object-fit: contain;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 8px;
+      margin: 0 auto 1.25rem;
+      display: block;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .role-picker-logo {
+      width: 64px; height: 64px;
+      background: var(--grad-primary);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto 1.25rem;
+      box-shadow: 0 8px 32px var(--primary-glow);
+    }
+    .role-picker-header h1 { font-size: clamp(1.5rem, 3vw, 2.2rem); margin-bottom: 0.5rem; }
+    .role-picker-header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+    .role-cards {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 820px;
+      width: 100%;
+    }
+
+    .role-card {
+      flex: 1;
+      min-width: 220px;
+      max-width: 240px;
+      background: var(--grad-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem 1.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+    .role-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--grad-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
+    }
+    .role-card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: 0 20px 60px rgba(99,102,241,0.25); }
+    .role-card:hover::before { opacity: 0.06; }
+    .role-card:active { transform: translateY(-2px); }
+
+    .role-card-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 1.25rem;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+    }
+    .role-card:hover .role-card-icon { transform: scale(1.1); }
+
+    .role-card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .role-card-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+    .role-card-arrow {
+      margin-top: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary-light);
+      position: relative;
+      z-index: 1;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.25s ease;
+    }
+    .role-card:hover .role-card-arrow { opacity: 1; transform: translateY(0); }
+
+    /* student = purple, teacher = cyan, hod = gold */
+    .role-card-student .role-card-icon { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.25); }
+    .role-card-teacher .role-card-icon { background: rgba(6,182,212,0.15);  border: 1px solid rgba(6,182,212,0.25); }
+    .role-card-hod    .role-card-icon { background: rgba(245,158,11,0.15);  border: 1px solid rgba(245,158,11,0.25); }
+
+    .role-card-student:hover { border-color: var(--primary); }
+    .role-card-teacher:hover { border-color: var(--accent); }
+    .role-card-hod:hover    { border-color: var(--warning); }
+
+    /* ── Login Form Screen ────────────────────────────────────────────── */
+    #login-screen {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    #login-screen.active { display: flex; }
+
+    .login-box {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 440px;
+      padding: 2.5rem;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+      animation: scaleIn 0.3s ease;
+    }
+
+    .login-box-header { text-align: center; margin-bottom: 2rem; }
+
+    .login-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 99px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 1.1rem;
+    }
+    .badge-student { background: rgba(99,102,241,0.15); color: var(--primary-light); border: 1px solid rgba(99,102,241,0.3); }
+    .badge-teacher { background: rgba(6,182,212,0.15);  color: var(--accent-light);  border: 1px solid rgba(6,182,212,0.3); }
+    .badge-hod     { background: rgba(245,158,11,0.15); color: #fbbf24;              border: 1px solid rgba(245,158,11,0.3); }
+
+    .login-box-header h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .login-box-header p  { color: var(--text-secondary); font-size: 0.88rem; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-primary); }
+
+    .login-divider-line {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .register-link-row {
+      text-align: center;
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .register-link-row a { color: var(--primary-light); font-weight: 600; cursor: pointer; }
+    .register-link-row a:hover { color: var(--accent-light); }
+
+    /* ── Register Form (inside login screen) ─────────────────────────── */
+    #register-section { display: none; }
+    #register-section.active { display: block; animation: fadeIn 0.25s ease; }
+    #login-section.active { animation: fadeIn 0.25s ease; }
+
+    @keyframes scaleIn { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="login-bg-grid"></div>
+  <div id="toast-container"></div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       STEP 1 — Role Picker
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div id="role-picker">
+    <div class="role-picker-header">
+      <img src="/static/images/mahendra-logo.jpg" alt="Mahendra Educational Institutions" class="college-logo" />
+      <h1>AI Student Performance System</h1>
+      <p>Mahendra Educational Institutions &mdash; Select your role to continue</p>
+    </div>
+
+    <div class="role-cards">
+      <!-- Student -->
+      <div class="role-card role-card-student" id="card-student" onclick="selectRoleAndLogin('student')">
+        <div class="role-card-icon">👨‍🎓</div>
+        <div class="role-card-title">Student</div>
+        <div class="role-card-desc">View marks, AI predictions, study plans &amp; assignments</div>
+        <div class="role-card-arrow">Login as Student →</div>
+      </div>
+
+      <!-- Teacher -->
+      <div class="role-card role-card-teacher" id="card-teacher" onclick="selectRoleAndLogin('teacher')">
+        <div class="role-card-icon">👩‍🏫</div>
+        <div class="role-card-title">Teacher</div>
+        <div class="role-card-desc">Manage students, enter marks &amp; assign tasks</div>
+        <div class="role-card-arrow">Login as Teacher →</div>
+      </div>
+
+      <!-- HOD -->
+      <div class="role-card role-card-hod" id="card-hod" onclick="selectRoleAndLogin('hod')">
+        <div class="role-card-icon">🏛️</div>
+        <div class="role-card-title">HOD</div>
+        <div class="role-card-desc">Monitor departments, analytics &amp; all academic activities</div>
+        <div class="role-card-arrow">Login as HOD →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       STEP 2 — Login / Register Form
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div id="login-screen">
+    <div class="login-box">
+
+      <!-- Back button -->
+      <button class="back-btn" onclick="goBack()">← Back to role selection</button>
+
+      <!-- Role badge -->
+      <div class="login-box-header">
+        <div id="role-badge" class="login-role-badge badge-student">👨‍🎓 Student</div>
+        <h2 id="login-title">Welcome Back</h2>
+        <p id="login-subtitle">Sign in to your Student account</p>
+      </div>
+
+      <!-- ── Sign In Section ─────────────────────────────────────────── -->
+      <div id="login-section" class="active">
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email" id="login-email" class="form-control" placeholder="your@email.com" required autocomplete="email" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="login-password" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="login-btn" style="width:100%;margin-top:0.75rem">
+            Sign In →
+          </button>
+        </form>
+
+        <div class="login-divider-line"></div>
+        <div class="register-link-row">
+          Don't have an account? <a onclick="showRegister()">Register here</a>
+        </div>
+      </div>
+
+      <!-- ── Register Section ───────────────────────────────────────── -->
+      <div id="register-section">
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="reg-name" class="form-control" placeholder="Enter full name" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select id="reg-department" class="form-control" required>
+              <option value="">Select Department</option>
+              <option>Computer Science</option>
+              <option>Information Technology</option>
+              <option>Electronics</option>
+              <option>Mechanical</option>
+              <option>Civil</option>
+              <option>Electrical</option>
+            </select>
+          </div>
+
+          <!-- Student-only fields -->
+          <div id="student-extra-fields">
+            <div class="form-group">
+              <label class="form-label">Roll Number</label>
+              <input type="text" id="reg-roll" class="form-control" placeholder="e.g. CS2024001" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Semester</label>
+              <select id="reg-semester" class="form-control">
+                <option value="1">Semester 1</option><option value="2">Semester 2</option>
+                <option value="3">Semester 3</option><option value="4">Semester 4</option>
+                <option value="5">Semester 5</option><option value="6">Semester 6</option>
+                <option value="7">Semester 7</option><option value="8">Semester 8</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="Min. 6 characters" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="register-btn" style="width:100%">
+            Create Account →
+          </button>
+        </form>
+
+        <div class="login-divider-line"></div>
+        <div class="register-link-row">
+          Already have an account? <a onclick="showLogin()">Sign in</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/utils.js"></script>
+  <script>
+    // ── Auto-redirect if already logged in ─────────────────────────────
+    if (Auth.isLoggedIn()) redirectByRole(Auth.getRole());
+
+    let activeRole = 'student';
+
+    const roleConfig = {
+      student: {
+        icon: '👨‍🎓',
+        label: 'Student',
+        badgeClass: 'badge-student',
+        title: 'Welcome Back',
+        subtitle: 'Sign in to your Student account',
+      },
+      teacher: {
+        icon: '👩‍🏫',
+        label: 'Teacher',
+        badgeClass: 'badge-teacher',
+        title: 'Welcome Back',
+        subtitle: 'Sign in to your Teacher account',
+      },
+      hod: {
+        icon: '🏛️',
+        label: 'HOD',
+        badgeClass: 'badge-hod',
+        title: 'Welcome Back',
+        subtitle: 'Sign in to your HOD account',
+      },
+    };
+
+    // ── Step 1: Role card clicked ──────────────────────────────────────
+    function selectRoleAndLogin(role) {
+      activeRole = role;
+      const cfg = roleConfig[role];
+
+      // Update badge
+      const badge = document.getElementById('role-badge');
+      badge.className = `login-role-badge ${cfg.badgeClass}`;
+      badge.textContent = `${cfg.icon} ${cfg.label}`;
+
+      // Update heading
+      document.getElementById('login-title').textContent = cfg.title;
+      document.getElementById('login-subtitle').textContent = cfg.subtitle;
+
+      // Show/hide student-only register fields
+      document.getElementById('student-extra-fields').style.display =
+        role === 'student' ? 'block' : 'none';
+
+      // Animate transition
+      const picker = document.getElementById('role-picker');
+      const screen = document.getElementById('login-screen');
+
+      picker.style.opacity = '0';
+      picker.style.transform = 'scale(0.96)';
+      picker.style.transition = 'all 0.25s ease';
+
+      setTimeout(() => {
+        picker.style.display = 'none';
+        screen.classList.add('active');
+        // focus email field
+        document.getElementById('login-email').focus();
+      }, 220);
+    }
+
+    // ── Step 2: Back to role picker ────────────────────────────────────
+    function goBack() {
+      const picker = document.getElementById('role-picker');
+      const screen = document.getElementById('login-screen');
+
+      screen.classList.remove('active');
+      picker.style.display = 'flex';
+      picker.style.opacity = '0';
+      picker.style.transform = 'scale(0.96)';
+
+      requestAnimationFrame(() => {
+        picker.style.transition = 'all 0.25s ease';
+        picker.style.opacity = '1';
+        picker.style.transform = 'scale(1)';
+      });
+
+      // Reset form
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+      showLogin();
+    }
+
+    // ── Toggle between sign-in and register ───────────────────────────
+    function showRegister() {
+      document.getElementById('login-section').classList.remove('active');
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('register-section').classList.add('active');
+      document.getElementById('register-section').style.display = 'block';
+    }
+
+    function showLogin() {
+      document.getElementById('register-section').classList.remove('active');
+      document.getElementById('register-section').style.display = 'none';
+      document.getElementById('login-section').classList.add('active');
+      document.getElementById('login-section').style.display = 'block';
+    }
+
+    // ── Handle Login ──────────────────────────────────────────────────
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      setLoading(btn, true, 'Signing in...');
+      try {
+        const data = await api.login({
+          email: document.getElementById('login-email').value,
+          password: document.getElementById('login-password').value,
+        });
+
+        // Validate role matches selected card
+        if (data.user.role !== activeRole) {
+          showToast(`This account is a ${data.user.role}, not a ${activeRole}. Redirecting...`, 'warning');
+        }
+
+        Auth.setSession(data.token, data.user);
+        showToast(`Welcome, ${data.user.name}!`, 'success');
+        setTimeout(() => redirectByRole(data.user.role), 700);
+      } catch (err) {
+        showToast(err.message, 'error');
+        setLoading(btn, false);
+      }
+    }
+
+    // ── Handle Register ───────────────────────────────────────────────
+    async function handleRegister(e) {
+      e.preventDefault();
+      const btn = document.getElementById('register-btn');
+      setLoading(btn, true, 'Creating account...');
+      const body = {
+        name: document.getElementById('reg-name').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        role: activeRole,
+        department: document.getElementById('reg-department').value,
+      };
+      if (activeRole === 'student') {
+        body.roll_number = document.getElementById('reg-roll').value;
+        body.semester = document.getElementById('reg-semester').value;
+      }
+      try {
+        await api.register(body);
+        showToast('Account created! Please sign in.', 'success');
+        setTimeout(() => showLogin(), 800);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        setLoading(btn, false);
+      }
+    }
+
+    // ── Redirect after login ──────────────────────────────────────────
+    function redirectByRole(role) {
+      const routes = { student: '/student/', teacher: '/teacher/', hod: '/hod/' };
+      window.location.href = routes[role] || '/';
+    }
+  </script>
+</body>
+</html>

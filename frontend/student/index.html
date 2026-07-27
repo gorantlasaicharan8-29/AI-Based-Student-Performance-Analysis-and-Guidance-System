@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard — AI Performance System</title>
+  <meta name="description" content="Student dashboard for AI-based performance analysis, predictions, and personalized guidance." />
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="app-layout">
+  <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="/static/images/mahendra-logo.jpg" alt="Mahendra" class="sidebar-college-logo" />
+      <div class="sidebar-logo-text">
+        <span class="brand">AI Performance</span>
+        <span class="tagline">Student Portal</span>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-name" id="sidebar-user-name">Loading...</div>
+      <div class="user-role" id="sidebar-user-role">STUDENT</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <button class="nav-item active" data-section="sec-overview" onclick="activateSection('sec-overview')">
+        <span class="nav-icon">🏠</span> Overview
+      </button>
+      <button class="nav-item" data-section="sec-marks" onclick="activateSection('sec-marks')">
+        <span class="nav-icon">📊</span> My Marks
+      </button>
+      <button class="nav-item" data-section="sec-predict" onclick="activateSection('sec-predict')">
+        <span class="nav-icon">🤖</span> AI Prediction
+      </button>
+      <button class="nav-item" data-section="sec-guidance" onclick="activateSection('sec-guidance')">
+        <span class="nav-icon">🧭</span> Guidance Plan
+      </button>
+      <button class="nav-item" data-section="sec-units" onclick="activateSection('sec-units');loadUnitRecommendations()">
+        <span class="nav-icon">📚</span> Study Units
+      </button>
+      <div class="nav-section-label">Tasks</div>
+      <button class="nav-item" data-section="sec-assignments" onclick="activateSection('sec-assignments')">
+        <span class="nav-icon">📋</span> Assignments
+      </button>
+      <div class="nav-section-label">Account</div>
+      <button class="nav-item" data-section="sec-profile" onclick="activateSection('sec-profile')">
+        <span class="nav-icon">👤</span> Profile
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-secondary" style="width:100%" onclick="logout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────────────────── -->
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <span class="topbar-title" id="topbar-title">Overview</span>
+      <div class="topbar-actions">
+        <a id="pdf-btn" class="btn btn-secondary btn-sm" target="_blank">📄 PDF Report</a>
+        <div class="topbar-notif-btn" id="notif-toggle" onclick="toggleNotifPanel()">
+          🔔 <span class="notif-dot hidden" id="notif-dot"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Notification Panel -->
+    <div class="notif-panel hidden" id="notif-panel">
+      <div class="notif-panel-header">
+        <span style="font-weight:700">Notifications</span>
+        <button class="btn btn-secondary btn-sm" onclick="markAllRead()">Mark all read</button>
+      </div>
+      <div class="notif-list" id="notif-list"><div class="empty-state"><p>No notifications</p></div></div>
+    </div>
+
+    <main class="page-content">
+
+      <!-- ── OVERVIEW ───────────────────────────────────────────────────── -->
+      <section class="page-section active" id="sec-overview">
+        <div class="stats-grid" id="overview-stats">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(99,102,241,0.15)">📊</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-avg">--</div>
+              <div class="stat-label">Average Marks</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(6,182,212,0.15)">📅</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-att">--</div>
+              <div class="stat-label">Avg Attendance</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.15)">⭐</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-strong">--</div>
+              <div class="stat-label">Strong Subjects</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(239,68,68,0.15)">⚠️</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-weak">--</div>
+              <div class="stat-label">Weak Subjects</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="section-header">
+              <h3 class="section-title">Subject Performance</h3>
+            </div>
+            <div class="chart-container"><canvas id="chart-subjects"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="section-header">
+              <h3 class="section-title">AI Prediction</h3>
+            </div>
+            <div id="pred-summary">
+              <div class="empty-state">
+                <div class="empty-state-icon">🤖</div>
+                <p>No prediction yet. Go to <strong>AI Prediction</strong> tab.</p>
+                <button class="btn btn-primary btn-sm" style="margin-top:0.75rem" onclick="activateSection('sec-predict')">Run Prediction →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem">
+          <div class="section-header">
+            <h3 class="section-title">Subject Details</h3>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Subject</th><th>Marks</th><th>Attendance</th><th>Assignment</th><th>Progress</th><th>Status</th></tr>
+              </thead>
+              <tbody id="marks-table-body"><tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── MARKS ──────────────────────────────────────────────────────── -->
+      <section class="page-section" id="sec-marks">
+        <div class="section-header">
+          <h2>My Marks</h2>
+        </div>
+        <div class="card">
+          <div id="marks-detail-content"><div class="empty-state"><div class="empty-state-icon">📚</div><p>No marks recorded yet.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ── AI PREDICTION ──────────────────────────────────────────────── -->
+      <section class="page-section" id="sec-predict">
+        <div class="section-header">
+          <h2>AI Performance Prediction</h2>
+          <button class="btn btn-primary" id="run-predict-btn" onclick="runPrediction()">🤖 Run AI Analysis</button>
+        </div>
+        <div id="prediction-result">
+          <div class="card" style="text-align:center;padding:3rem">
+            <div style="font-size:4rem;margin-bottom:1rem">🤖</div>
+            <h3>AI Prediction Engine</h3>
+            <p style="color:var(--text-secondary);margin:0.75rem 0">Our Random Forest model will analyze your marks, attendance, and assignments to predict your grade and risk level.</p>
+            <button class="btn btn-primary btn-lg" style="margin-top:1rem" onclick="runPrediction()">Run Prediction →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── GUIDANCE ───────────────────────────────────────────────────── -->
+      <section class="page-section" id="sec-guidance">
+        <div class="section-header"><h2>Personalized Guidance</h2></div>
+        <div id="guidance-content">
+          <div class="card" style="text-align:center;padding:3rem">
+            <div style="font-size:3rem;margin-bottom:1rem">🧭</div>
+            <p style="color:var(--text-secondary)">Run the AI Prediction first to generate your personalized study plan.</p>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="activateSection('sec-predict')">Go to Prediction →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── STUDY UNITS (AI Recommendations) ─────────────────────────── -->
+      <section class="page-section" id="sec-units">
+        <div class="section-header">
+          <h2>📚 AI Unit Study Recommendations</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadUnitRecommendations()">🔄 Refresh</button>
+        </div>
+        <div id="unit-rec-content">
+          <div class="card" style="text-align:center;padding:3rem">
+            <div style="font-size:3rem;margin-bottom:1rem">⏳</div>
+            <p style="color:var(--text-secondary)">Loading recommendations...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ASSIGNMENTS ────────────────────────────────────────────────── -->
+      <section class="page-section" id="sec-assignments">
+        <div class="section-header"><h2>Assignments</h2></div>
+        <div id="assignments-list"><div class="empty-state"><div class="empty-state-icon">📋</div><p>No assignments yet.</p></div></div>
+      </section>
+
+      <!-- ── PROFILE ────────────────────────────────────────────────────── -->
+      <section class="page-section" id="sec-profile">
+        <div class="section-header"><h2>My Profile</h2></div>
+        <div class="card" id="profile-content">Loading...</div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Add Mark Modal ────────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="modal-add-mark">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add / Update Marks</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-mark')">×</button>
+    </div>
+    <form onsubmit="submitMark(event)">
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <select id="mark-subject-id" class="form-control" required></select>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Marks (0-100)</label>
+          <input type="number" id="mark-marks" class="form-control" min="0" max="100" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Attendance %</label>
+          <input type="number" id="mark-att" class="form-control" min="0" max="100" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assignment Score (0-100)</label>
+        <input type="number" id="mark-assign" class="form-control" min="0" max="100" />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%" id="save-mark-btn">Save Marks</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Submit Assignment Modal ───────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="modal-submit">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="submit-modal-title">Submit Assignment</h3>
+      <button class="modal-close" onclick="closeModal('modal-submit')">×</button>
+    </div>
+    <form onsubmit="submitAssignment(event)">
+      <input type="hidden" id="submit-assign-id" />
+      <div class="form-group">
+        <label class="form-label">Upload File</label>
+        <label class="file-drop-zone" for="submit-file">
+          <input type="file" id="submit-file" />
+          <div>📁 Click to select file (PDF, DOC, Image)</div>
+          <div id="submit-file-name" style="margin-top:0.5rem;color:var(--primary-light);font-size:0.85rem"></div>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%" id="submit-assign-btn">Submit Assignment</button>
+    </form>
+  </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/student.js"></script>
+</body>
+</html>
