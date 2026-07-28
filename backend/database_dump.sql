@@ -17,7 +17,7 @@ CREATE TABLE `users` (
   `is_active` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `department`, `created_at`, `is_active`) VALUES
 (1, 'Dr. Rajesh Kumar', 'hod@college.edu', '$2b$12$UyoVE2x5KXgSwTOOzkje9uqE1TrlOIGWmDkbws1yI.QkOv086Y2W6', 'hod', 'Computer Science', '2026-07-27 17:45:10', 1),
@@ -29,7 +29,8 @@ INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `department
 (7, 'Chitra', 'chitramec@gmail.com', '$2b$12$0KBp4BnkGpo2LnNtpw3/ReUK3ncD4fxJHSF2XdwdkK5ebziWuKwcq', 'teacher', 'Computer Science', '2026-07-25 14:54:00', 1),
 (8, 'Ananth', 'mecananths@gmail.com', '$2b$12$D/8z4Py6eozuU44WH8.6quaHvk5gCA.SQCdxEUCca9C1CQeB/vcYy', 'hod', 'Computer Science', '2026-07-27 13:42:53', 1),
 (9, 'Sowmith', 'sowmith@gmail.com', '$2b$12$yb6UjvqlTJVnDRxtX.VpP.sY3pSCCGWf2k8/QsV5shZ5VD6Bq/10G', 'student', 'Computer Science', '2026-07-27 13:55:55', 1),
-(10, 'Shaik Ashik', 'shaikashik@gmail.com', '$2b$12$LrUocaFvjbZhHDPdZ9D5ReVnxikgDy04hEBYMM4dQI1vCs/SRvePW', 'student', 'Computer Science', '2026-07-27 13:55:55', 1);
+(10, 'Shaik Ashik', 'shaikashik@gmail.com', '$2b$12$LrUocaFvjbZhHDPdZ9D5ReVnxikgDy04hEBYMM4dQI1vCs/SRvePW', 'student', 'Computer Science', '2026-07-27 13:55:55', 1),
+(11, 'Adithya', 'adithya@gmail.com', '$2b$12$kUfTQkcx8Ke0doqTgXVsxOIC0j2/P91/fY5gXmNONJk0xj/G8wP7a', 'student', 'Computer Science', '2026-07-28 09:09:02', 1);
 
 DROP TABLE IF EXISTS `students`;
 CREATE TABLE `students` (
@@ -43,14 +44,15 @@ CREATE TABLE `students` (
   UNIQUE KEY `roll_number` (`roll_number`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `students_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `students` (`id`, `user_id`, `roll_number`, `department`, `semester`, `batch`) VALUES
 (1, 4, 'CS2024001', 'Computer Science', 4, '2024'),
 (2, 5, 'CS2024002', 'Computer Science', 4, '2024'),
 (3, 6, 'CS2024003', 'Computer Science', 4, '2024'),
 (4, 9, 'CS2024004', 'Computer Science', 4, '2024'),
-(5, 10, 'CS2024005', 'Computer Science', 4, '2024');
+(5, 10, 'CS2024005', 'Computer Science', 4, '2024'),
+(6, 11, 'CS2024006', 'Computer Science', 4, '2024');
 
 DROP TABLE IF EXISTS `subjects`;
 CREATE TABLE `subjects` (
@@ -86,34 +88,39 @@ CREATE TABLE `marks` (
   KEY `subject_id` (`subject_id`),
   CONSTRAINT `marks_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`),
   CONSTRAINT `marks_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `marks` (`id`, `student_id`, `subject_id`, `marks`, `attendance`, `assignment_score`, `recorded_at`) VALUES
-(1, 1, 1, 78.0, 89.0, 85.0, '2026-07-27 13:47:22'),
-(2, 1, 2, 80.0, 95.0, 88.0, '2026-07-27 13:47:22'),
-(3, 1, 3, 85.0, 80.0, 82.0, '2026-07-27 13:47:22'),
-(4, 1, 4, 75.0, 78.0, 80.0, '2026-07-27 13:47:22'),
-(5, 1, 5, 80.0, 77.0, 88.0, '2026-07-27 13:47:22'),
-(6, 2, 1, 95.0, 92.0, 90.0, '2026-07-27 13:50:57'),
-(7, 2, 2, 88.0, 90.0, 82.0, '2026-07-27 13:50:57'),
-(8, 2, 3, 89.0, 97.0, 96.0, '2026-07-27 13:50:57'),
-(9, 2, 4, 88.0, 79.0, 87.0, '2026-07-27 13:50:57'),
-(10, 2, 5, 90.0, 80.0, 90.0, '2026-07-27 13:50:57'),
-(11, 3, 1, 85.0, 90.0, 90.0, '2026-07-27 13:52:39'),
-(12, 3, 2, 79.0, 90.0, 90.0, '2026-07-27 13:52:39'),
-(13, 3, 3, 88.0, 87.0, 88.0, '2026-07-27 13:52:39'),
-(14, 3, 4, 79.0, 80.0, 90.0, '2026-07-27 13:52:39'),
-(15, 3, 5, 90.0, 88.0, 95.0, '2026-07-27 13:52:39'),
-(16, 4, 1, 77.0, 85.0, 88.0, '2026-07-27 13:58:21'),
-(17, 4, 2, 85.0, 85.0, 90.0, '2026-07-27 13:58:21'),
-(18, 4, 3, 90.0, 85.0, 85.0, '2026-07-27 13:58:21'),
-(19, 4, 4, 70.0, 75.0, 80.0, '2026-07-27 13:58:21'),
-(20, 4, 5, 71.0, 75.0, 90.0, '2026-07-27 13:58:21'),
-(21, 5, 1, 85.0, 88.0, 95.0, '2026-07-27 13:59:07'),
-(22, 5, 2, 75.0, 95.0, 85.0, '2026-07-27 13:59:07'),
-(23, 5, 3, 79.0, 88.0, 95.0, '2026-07-27 13:59:07'),
-(24, 5, 4, 69.0, 85.0, 79.0, '2026-07-27 13:59:07'),
-(25, 5, 5, 69.0, 75.0, 75.0, '2026-07-27 13:59:07');
+(1, 1, 1, 78.0, 89.0, 85.0, '2026-07-27 18:10:19'),
+(2, 1, 2, 80.0, 95.0, 88.0, '2026-07-27 18:10:19'),
+(3, 1, 3, 85.0, 80.0, 82.0, '2026-07-27 18:10:19'),
+(4, 1, 4, 75.0, 78.0, 80.0, '2026-07-27 18:10:19'),
+(5, 1, 5, 80.0, 77.0, 88.0, '2026-07-27 18:10:19'),
+(6, 2, 1, 95.0, 92.0, 90.0, '2026-07-27 18:10:22'),
+(7, 2, 2, 88.0, 90.0, 82.0, '2026-07-27 18:10:22'),
+(8, 2, 3, 89.0, 97.0, 96.0, '2026-07-27 18:10:22'),
+(9, 2, 4, 88.0, 79.0, 87.0, '2026-07-27 18:10:22'),
+(10, 2, 5, 90.0, 80.0, 90.0, '2026-07-27 18:10:22'),
+(11, 3, 1, 85.0, 90.0, 90.0, '2026-07-27 18:10:25'),
+(12, 3, 2, 79.0, 90.0, 90.0, '2026-07-27 18:10:25'),
+(13, 3, 3, 88.0, 87.0, 88.0, '2026-07-27 18:10:25'),
+(14, 3, 4, 79.0, 80.0, 90.0, '2026-07-27 18:10:25'),
+(15, 3, 5, 90.0, 88.0, 95.0, '2026-07-27 18:10:25'),
+(16, 4, 1, 77.0, 85.0, 88.0, '2026-07-27 18:10:27'),
+(17, 4, 2, 85.0, 85.0, 90.0, '2026-07-27 18:10:27'),
+(18, 4, 3, 90.0, 85.0, 85.0, '2026-07-27 18:10:27'),
+(19, 4, 4, 70.0, 75.0, 80.0, '2026-07-27 18:10:27'),
+(20, 4, 5, 71.0, 75.0, 90.0, '2026-07-27 18:10:27'),
+(21, 5, 1, 85.0, 88.0, 95.0, '2026-07-27 18:10:29'),
+(22, 5, 2, 75.0, 95.0, 85.0, '2026-07-27 18:10:29'),
+(23, 5, 3, 79.0, 88.0, 95.0, '2026-07-27 18:10:29'),
+(24, 5, 4, 69.0, 85.0, 79.0, '2026-07-27 18:10:29'),
+(25, 5, 5, 69.0, 75.0, 75.0, '2026-07-27 18:10:29'),
+(26, 6, 1, 88.0, 92.0, 90.0, '2026-07-28 09:09:02'),
+(27, 6, 2, 82.0, 85.0, 85.0, '2026-07-28 09:09:02'),
+(28, 6, 3, 85.0, 90.0, 88.0, '2026-07-28 09:09:02'),
+(29, 6, 4, 79.0, 82.0, 80.0, '2026-07-28 09:09:02'),
+(30, 6, 5, 91.0, 94.0, 92.0, '2026-07-28 09:09:02');
 
 DROP TABLE IF EXISTS `units`;
 CREATE TABLE `units` (
@@ -335,14 +342,16 @@ CREATE TABLE `predictions` (
   PRIMARY KEY (`id`),
   KEY `student_id` (`student_id`),
   CONSTRAINT `predictions_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `predictions` (`id`, `student_id`, `grade`, `risk_level`, `confidence`, `factors`, `recommendations`, `average_marks`, `average_attendance`, `created_at`) VALUES
 (1, 1, 'B', 'Low', 85.1, '[{"factor": "Good academic marks", "impact": "positive", "value": "79.6%"}, {"factor": "Good attendance record", "impact": "positive", "value": "83.8%"}, {"factor": "4 subject(s) above distinction threshold", "impact": "positive", "value": "4 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 79.6, 83.8, '2026-07-27 13:47:53'),
 (2, 2, 'A', 'Low', 86.8, '[{"factor": "Excellent academic marks", "impact": "positive", "value": "90.0%"}, {"factor": "Good attendance record", "impact": "positive", "value": "87.6%"}, {"factor": "5 subject(s) above distinction threshold", "impact": "positive", "value": "5 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Maintain your excellent performance \\u2014 consistency is key", "Consider mentoring struggling peers to reinforce your knowledge"]', 90.0, 87.6, '2026-07-27 13:53:00'),
 (3, 3, 'B', 'Low', 77.6, '[{"factor": "Good academic marks", "impact": "positive", "value": "84.2%"}, {"factor": "Good attendance record", "impact": "positive", "value": "87.0%"}, {"factor": "5 subject(s) above distinction threshold", "impact": "positive", "value": "5 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 84.2, 87.0, '2026-07-27 13:53:46'),
 (4, 5, 'B', 'Low', 89.1, '[{"factor": "Good academic marks", "impact": "positive", "value": "75.4%"}, {"factor": "Good attendance record", "impact": "positive", "value": "86.2%"}, {"factor": "2 subject(s) above distinction threshold", "impact": "positive", "value": "2 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 75.4, 86.2, '2026-07-27 14:10:43'),
-(5, 5, 'B', 'Low', 89.1, '[{"factor": "Good academic marks", "impact": "positive", "value": "75.4%"}, {"factor": "Good attendance record", "impact": "positive", "value": "86.2%"}, {"factor": "2 subject(s) above distinction threshold", "impact": "positive", "value": "2 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 75.4, 86.2, '2026-07-27 14:53:34');
+(5, 5, 'B', 'Low', 89.1, '[{"factor": "Good academic marks", "impact": "positive", "value": "75.4%"}, {"factor": "Good attendance record", "impact": "positive", "value": "86.2%"}, {"factor": "2 subject(s) above distinction threshold", "impact": "positive", "value": "2 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 75.4, 86.2, '2026-07-27 14:53:34'),
+(6, 1, 'B', 'Low', 85.1, '[{"factor": "Good academic marks", "impact": "positive", "value": "79.6%"}, {"factor": "Good attendance record", "impact": "positive", "value": "83.8%"}, {"factor": "4 subject(s) above distinction threshold", "impact": "positive", "value": "4 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 79.6, 83.8, '2026-07-27 18:07:09'),
+(7, 1, 'B', 'Low', 85.1, '[{"factor": "Good academic marks", "impact": "positive", "value": "79.6%"}, {"factor": "Good attendance record", "impact": "positive", "value": "83.8%"}, {"factor": "4 subject(s) above distinction threshold", "impact": "positive", "value": "4 subjects"}, {"factor": "Excellent assignment completion", "impact": "positive", "value": "100%"}]', '["Great job maintaining low academic risk!", "Stay consistent with your study schedule", "Challenge yourself with extra-curricular academic activities", "Identify the 2\\u20133 topics where you lose most marks and focus there", "Practice time management during exams"]', 79.6, 83.8, '2026-07-27 18:07:12');
 
 DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
@@ -356,7 +365,7 @@ CREATE TABLE `notifications` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `is_read`, `created_at`, `notification_type`) VALUES
 (1, 2, 'Welcome to AI Student Performance System!', 'Hello Prof. Anita Sharma! Your teacher account is ready. Explore your dashboard.', 0, '2026-07-27 17:45:10', 'success'),
@@ -382,6 +391,12 @@ INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `is_read`, `cr
 (21, 5, '📋 New Assignment', '\'Operating Systems Assignment – Process Management and Memory Management\' assigned by Chitra. Deadline: 2026-08-04 11:59:00', 0, '2026-07-27 14:17:14', 'info'),
 (22, 6, '📋 New Assignment', '\'Operating Systems Assignment – Process Management and Memory Management\' assigned by Chitra. Deadline: 2026-08-04 11:59:00', 0, '2026-07-27 14:17:14', 'info'),
 (23, 9, '📋 New Assignment', '\'Operating Systems Assignment – Process Management and Memory Management\' assigned by Chitra. Deadline: 2026-08-04 11:59:00', 0, '2026-07-27 14:17:14', 'info'),
-(24, 10, '📋 New Assignment', '\'Operating Systems Assignment – Process Management and Memory Management\' assigned by Chitra. Deadline: 2026-08-04 11:59:00', 0, '2026-07-27 14:17:14', 'info');
+(24, 10, '📋 New Assignment', '\'Operating Systems Assignment – Process Management and Memory Management\' assigned by Chitra. Deadline: 2026-08-04 11:59:00', 0, '2026-07-27 14:17:14', 'info'),
+(25, 4, '📊 Marks Updated', 'Your marks have been updated by Chitra.', 0, '2026-07-27 18:10:19', 'info'),
+(26, 5, '📊 Marks Updated', 'Your marks have been updated by Chitra.', 0, '2026-07-27 18:10:22', 'info'),
+(27, 6, '📊 Marks Updated', 'Your marks have been updated by Chitra.', 0, '2026-07-27 18:10:25', 'info'),
+(28, 9, '📊 Marks Updated', 'Your marks have been updated by Chitra.', 0, '2026-07-27 18:10:27', 'info'),
+(29, 10, '📊 Marks Updated', 'Your marks have been updated by Chitra.', 0, '2026-07-27 18:10:29', 'info'),
+(30, 11, 'Welcome to AI Student Performance System!', 'Hello Adithya! Your student account is ready. Login to explore your dashboard.', 0, '2026-07-28 09:09:02', 'success');
 
 SET FOREIGN_KEY_CHECKS = 1;
