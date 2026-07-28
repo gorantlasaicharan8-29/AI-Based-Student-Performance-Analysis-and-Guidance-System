@@ -1,0 +1,18 @@
+{
+  "name": "ai-student-performance-system",
+  "version": "1.0.0",
+  "description": "AI-Based Student Performance Analysis and Guidance System",
+  "main": "backend/app.py",
+  "scripts": {
+    "dev": "python backend/app.py",
+    "start": "python backend/app.py"
+  },
+  "keywords": [
+    "ai",
+    "flask",
+    "student-performance",
+    "guidance-system"
+  ],
+  "author": "",
+  "license": "ISC"
+}
