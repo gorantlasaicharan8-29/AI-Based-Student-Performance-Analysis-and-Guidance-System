@@ -218,36 +218,6 @@
   </div>
 </div>
 
-<!-- ── Add Mark Modal ────────────────────────────────────────────────────── -->
-<div class="modal-overlay hidden" id="modal-add-mark">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Add / Update Marks</h3>
-      <button class="modal-close" onclick="closeModal('modal-add-mark')">×</button>
-    </div>
-    <form onsubmit="submitMark(event)">
-      <div class="form-group">
-        <label class="form-label">Subject</label>
-        <select id="mark-subject-id" class="form-control" required></select>
-      </div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label class="form-label">Marks (0-100)</label>
-          <input type="number" id="mark-marks" class="form-control" min="0" max="100" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Attendance %</label>
-          <input type="number" id="mark-att" class="form-control" min="0" max="100" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Assignment Score (0-100)</label>
-        <input type="number" id="mark-assign" class="form-control" min="0" max="100" />
-      </div>
-      <button type="submit" class="btn btn-primary" style="width:100%" id="save-mark-btn">Save Marks</button>
-    </form>
-  </div>
-</div>
 
 <!-- ── Submit Assignment Modal ───────────────────────────────────────────── -->
 <div class="modal-overlay hidden" id="modal-submit">

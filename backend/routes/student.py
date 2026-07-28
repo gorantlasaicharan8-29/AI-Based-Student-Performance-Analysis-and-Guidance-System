@@ -91,50 +91,8 @@ def get_marks():
 @student_bp.route("/marks", methods=["POST"])
 @require_student
 def add_marks():
-    """Students can self-report marks (teachers can also enter marks via teacher routes)."""
-    user_id = int(get_jwt_identity())
-    student, err, code = get_student_or_404(user_id)
-    if err:
-        return err, code
-
-    data = request.get_json()
-    ok, msg = validate_required_fields(data, ["subject_id", "marks"])
-    if not ok:
-        return jsonify({"error": msg}), 400
-
-    ok, msg = validate_marks(data["marks"])
-    if not ok:
-        return jsonify({"error": msg}), 400
-
-    if "attendance" in data:
-        ok, msg = validate_attendance(data["attendance"])
-        if not ok:
-            return jsonify({"error": msg}), 400
-
-    subject = Subject.query.get(data["subject_id"])
-    if not subject:
-        return jsonify({"error": "Subject not found"}), 404
-
-    # Check if mark already exists for this student+subject
-    existing = Mark.query.filter_by(student_id=student.id, subject_id=data["subject_id"]).first()
-    if existing:
-        existing.marks = float(data["marks"])
-        existing.attendance = float(data.get("attendance", existing.attendance))
-        existing.assignment_score = float(data.get("assignment_score", existing.assignment_score))
-        existing.recorded_at = datetime.utcnow()
-        db.session.commit()
-        return jsonify({"message": "Marks updated", "mark": existing.to_dict()}), 200
-
-    mark = Mark(
-        student_id=student.id,
-        subject_id=data["subject_id"],
-        marks=float(data["marks"]),
-        attendance=float(data.get("attendance", 0)),
-        assignment_score=float(data.get("assignment_score", 0)),
-    )
-    db.session.add(mark)
-    db.session.commit()
-    return jsonify({"message": "Marks added", "mark": mark.to_dict()}), 201
+    """Restricted: Only teachers can enter or modify student marks."""
+    return jsonify({"error": "Access denied. Only teachers are authorized to enter or modify marks."}), 403
 
 
 # ─── Performance Analytics ────────────────────────────────────────────────────
