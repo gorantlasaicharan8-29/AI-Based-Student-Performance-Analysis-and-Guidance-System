@@ -39,3 +39,18 @@ ENV/
 # OS files
 Thumbs.db
 Desktop.ini
+
+# Uploads (don't commit user files)
+backend/uploads/assignments/*
+backend/uploads/submissions/*
+!backend/uploads/assignments/.gitkeep
+!backend/uploads/submissions/.gitkeep
+
+# SQLite (using MySQL in prod)
+*.db
+
+# Logs
+*.log
+
+# ML model — DO NOT ignore, must be deployed
+!backend/ml/saved_model.pkl

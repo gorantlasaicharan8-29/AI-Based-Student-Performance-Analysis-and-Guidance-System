@@ -227,8 +227,10 @@ def _seed_demo_syllabus():
 
 if __name__ == "__main__":
     app = create_app()
+    port = int(os.getenv("PORT", 5000))
+    debug = os.getenv("FLASK_ENV", "production") == "development"
     print("\n" + "="*60)
     print(" AI Student Performance System")
-    print(" URL: http://localhost:5000")
+    print(f" URL: http://localhost:{port}")
     print("="*60 + "\n")
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=debug, host="0.0.0.0", port=port)

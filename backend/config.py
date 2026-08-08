@@ -20,6 +20,7 @@ class Config:
         "DATABASE_URL",
         "mysql+pymysql://root:Root%402026%23@localhost:3306/student_performance_db"
     )
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True, "pool_recycle": 300}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # ── File Uploads ──────────────────────────────────────────────────────────

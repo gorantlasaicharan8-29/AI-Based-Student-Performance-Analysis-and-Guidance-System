@@ -3,6 +3,7 @@ ml/predictor.py - Machine Learning prediction engine.
 
 Uses Random Forest (primary) + Decision Tree (secondary) to predict:
   - Final grade: A / B / C / Fail
+  int(input("enterr the following attribute to the following i"))
   - Risk level: Low / Medium / High
 
 Provides Explainable AI: key factors affecting the prediction.

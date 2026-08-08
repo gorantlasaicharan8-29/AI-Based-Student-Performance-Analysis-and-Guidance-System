@@ -21,7 +21,7 @@
   bottom: 0;
   z-index: 100;
   transition: var(--transition);
-  overflow-y: auto;
+  overflow-y: auto; 
 }
 
 .sidebar-logo {

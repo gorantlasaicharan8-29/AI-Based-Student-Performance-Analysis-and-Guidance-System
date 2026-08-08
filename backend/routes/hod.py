@@ -40,24 +40,26 @@ def get_overview():
 
     # Prediction stats
     if student_ids:
-        preds = (
-            db.session.query(Prediction.student_id, Prediction.grade, Prediction.risk_level)
+        all_preds = (
+            db.session.query(Prediction)
             .filter(Prediction.student_id.in_(student_ids))
-            .distinct(Prediction.student_id)
-            .order_by(Prediction.student_id, Prediction.created_at.desc())
+            .order_by(Prediction.created_at.desc())
             .all()
         )
+        seen_students = set()
+        preds = []
+        for p in all_preds:
+            if p.student_id not in seen_students:
+                seen_students.add(p.student_id)
+                preds.append(p)
     else:
         preds = []
 
     grade_dist = {"A": 0, "B": 0, "C": 0, "Fail": 0}
     risk_dist = {"Low": 0, "Medium": 0, "High": 0}
-    seen_students = set()
     for p in preds:
-        if p.student_id not in seen_students:
-            seen_students.add(p.student_id)
-            grade_dist[p.grade] = grade_dist.get(p.grade, 0) + 1
-            risk_dist[p.risk_level] = risk_dist.get(p.risk_level, 0) + 1
+        grade_dist[p.grade] = grade_dist.get(p.grade, 0) + 1
+        risk_dist[p.risk_level] = risk_dist.get(p.risk_level, 0) + 1
 
     # Assignment stats
     assignment_count = Assignment.query.filter_by(is_active=True).count()
